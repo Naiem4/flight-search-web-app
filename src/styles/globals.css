@@ -10,7 +10,7 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: oklch(0.61 0.11 183.98);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -153,4 +153,33 @@
 .animation-delay-900 {
   animation-delay: 0.9s;
   opacity: 0;
+}
+
+.bg-slider-pagination-bullet {
+  width: 12px !important;
+  height: 12px !important;
+  background: rgba(255, 255, 255, 0.5) !important;
+  opacity: 1 !important;
+  transition: all 0.3s ease !important;
+}
+
+.bg-slider-pagination-bullet-active {
+  background: white !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+.bg-slider-pagination-bullet:hover {
+  background: rgba(255, 255, 255, 0.75) !important;
+}
+
+.swiper-pagination {
+  bottom: 20px !important;
+  z-index: 30 !important;
+}
+
+@media (max-width: 640px) {
+  .bg-slider-pagination-bullet {
+    width: 8px !important;
+    height: 8px !important;
+  }
 }

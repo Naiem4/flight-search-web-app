@@ -39,7 +39,7 @@ export function Header() {
             >
               Sign Up
             </Button>
-            <Button className="bg-black text-white hover:bg-gray-800 shadow-sm hover:shadow-md transition-all duration-200">
+            <Button className=" text-white  shadow-sm hover:shadow-md transition-all duration-200">
               Log In
             </Button>
           </div>
