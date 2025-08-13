@@ -1,4 +1,3 @@
-'use server';
 
 import { buildUrlWithQuery } from '@/utils/url';
 import { getAccessToken } from '@/actions/getAccessToken-action';

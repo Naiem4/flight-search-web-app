@@ -1,4 +1,3 @@
-'use server';
 
 export const getAccessToken = async () => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_AUTH_URL}/token`, {
