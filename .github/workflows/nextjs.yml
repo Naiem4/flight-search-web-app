@@ -18,78 +18,44 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # Checkout the repository
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Detect package manager
-      - name: Detect package manager
-        id: detect-package-manager
-        run: |
-          if [ -f "${{ github.workspace }}/pnpm-lock.yaml" ]; then
-            echo "manager=pnpm" >> $GITHUB_OUTPUT
-            echo "command=install" >> $GITHUB_OUTPUT
-            echo "runner=pnpm" >> $GITHUB_OUTPUT
-          elif [ -f "${{ github.workspace }}/yarn.lock" ]; then
-            echo "manager=yarn" >> $GITHUB_OUTPUT
-            echo "command=install" >> $GITHUB_OUTPUT
-            echo "runner=yarn" >> $GITHUB_OUTPUT
-          elif [ -f "${{ github.workspace }}/package.json" ]; then
-            echo "manager=npm" >> $GITHUB_OUTPUT
-            echo "command=ci" >> $GITHUB_OUTPUT
-            echo "runner=npx --no-install" >> $GITHUB_OUTPUT
-          else
-            echo "Unable to determine package manager"
-            exit 1
-          fi
-
-      # Setup Node.js v22
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: ${{ steps.detect-package-manager.outputs.manager }}
+          cache: npm
 
-      # Setup pnpm if needed
-      - name: Setup pnpm
-        if: steps.detect-package-manager.outputs.manager == 'pnpm'
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8 # or latest stable
-
-      # Setup GitHub Pages
       - name: Setup Pages
         uses: actions/configure-pages@v5
         with:
           static_site_generator: next
 
-      # Restore Next.js cache
-      - name: Restore cache
+      - name: Restore Next.js cache
         uses: actions/cache@v4
         with:
           path: .next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml', '**/package-lock.json', '**/yarn.lock') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-          restore-keys: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml', '**/package-lock.json', '**/yarn.lock') }}-
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          restore-keys: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
 
-      # Install dependencies
       - name: Install dependencies
-        run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
+        run: npm ci
 
-      # Setup environment variables
       - name: Setup environment variables
         run: |
-          echo "NEXT_PUBLIC_API_BASE_URL=${{ secrets.API_BASE_URL }}" >> .env.production
-          echo "NEXT_PUBLIC_API_KEY=${{ secrets.API_KEY }}" >> .env.production
+          echo "NEXT_PUBLIC_AUTH_URL=${{ secrets.NEXT_PUBLIC_AUTH_URL }}" >> .env.production
+          echo "NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL }}" >> .env.production
+          echo "NEXT_PUBLIC_CITIES_URL=${{ secrets.NEXT_PUBLIC_CITIES_URL }}" >> .env.production
+          echo "AMADEUS_API_KEY=${{ secrets.AMADEUS_API_KEY }}" >> .env.production
+          echo "AMADEUS_API_SECRET=${{ secrets.AMADEUS_API_SECRET }}" >> .env.production
 
-      # Build Next.js
-      - name: Build with Next.js
-        run: ${{ steps.detect-package-manager.outputs.runner }} next build
+      - name: Build project
+        run: npm run build
 
-      # Export static site
-      - name: Export Next.js static site
-        run: ${{ steps.detect-package-manager.outputs.runner }} next export
+      - name: Export static site
+        run: npm run export
 
-      # Upload artifact
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
