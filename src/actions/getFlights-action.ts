@@ -1,4 +1,3 @@
-
 import { buildUrlWithQuery } from '@/utils/url';
 import { getAccessToken } from '@/actions/getAccessToken-action';
 import { FlightSearchParams } from '@/types';
@@ -32,7 +31,7 @@ export const getFlights = async ({
     nonStop,
     currencyCode,
   });
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${url}`, {
+  const response = await fetch(`${process.env.BASE_URL}${url}`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`,

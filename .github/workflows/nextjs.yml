@@ -3,7 +3,7 @@ name: Deploy Next.js App to GitHub Pages
 on:
   push:
     branches:
-      - main  # Change if your default branch is different
+      - main # Change if your default branch is different
 
 permissions:
   contents: write
@@ -32,9 +32,9 @@ jobs:
       - name: Build Next.js project
         run: npm run build
         env:
-          NEXT_PUBLIC_AUTH_URL: ${{ secrets.NEXT_PUBLIC_AUTH_URL }}
-          NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }}
-          NEXT_PUBLIC_CITIES_URL: ${{ secrets.NEXT_PUBLIC_CITIES_URL }}
+          AUTH_URL: ${{ secrets.AUTH_URL }}
+          BASE_URL: ${{ secrets.BASE_URL }}
+          CITIES_URL: ${{ secrets.CITIES_URL }}
           AMADEUS_API_KEY: ${{ secrets.AMADEUS_API_KEY }}
           AMADEUS_API_SECRET: ${{ secrets.AMADEUS_API_SECRET }}
 

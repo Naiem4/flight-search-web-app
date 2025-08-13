@@ -1,4 +1,3 @@
-
 import { buildUrlWithQuery } from '@/utils/url';
 import { getAccessToken } from '@/actions/getAccessToken-action';
 import { CitiesParams } from '@/types';
@@ -14,7 +13,7 @@ export const getCities = async ({
     max,
     include,
   });
-  const response = await fetch(`${process.env.NEXT_PUBLIC_CITIES_URL}${url}`, {
+  const response = await fetch(`${process.env.CITIES_URL}${url}`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`,

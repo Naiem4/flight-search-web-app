@@ -1,6 +1,5 @@
-
 export const getAccessToken = async () => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_AUTH_URL}/token`, {
+  const response = await fetch(`${process.env.AUTH_URL}/token`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
