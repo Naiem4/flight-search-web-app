@@ -1,22 +1,22 @@
 'use client';
 
-import { useState } from 'react';
-import { useForm, Control } from 'react-hook-form';
+import { LocationSearch } from '@/app/_components/LocationSearch';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent } from '@/components/ui/card';
 import { Calendar } from '@/components/ui/calendar';
+import { Card, CardContent } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { ArrowLeftRightIcon, CalendarIcon, Plane } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { PassengerSelector } from './PassengerSelector';
 import { FlightSearchParams } from '@/types';
-import { LocationSearch } from '@/app/_components/LocationSearch';
 import { formatDate, formatDateForInput } from '@/utils/formateDate';
+import { CalendarIcon, Plane } from 'lucide-react';
+import { useState } from 'react';
+import { Control, useForm } from 'react-hook-form';
+import { PassengerSelector } from './PassengerSelector';
 
 export interface SearchFormData {
   origin: string;

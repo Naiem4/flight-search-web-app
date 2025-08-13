@@ -13,5 +13,6 @@ export const useGetCitiesQuery = (params: CitiesParams, enabled: boolean) => {
       });
       return response;
     },
+    enabled,
   });
 };

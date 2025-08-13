@@ -1,6 +1,7 @@
 import { Flight } from "@/types";
 
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function mapFlights(data: any[], dictionaries: any): Flight[] {
   return data.map((offer) => {
     const firstSegment = offer.itineraries[0].segments[0];
