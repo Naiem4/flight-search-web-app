@@ -21,7 +21,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'   # change to your required Node version
+          node-version: '22'   # change to your required Node version
           cache: 'pnpm'
 
       # 3. Install pnpm globally
