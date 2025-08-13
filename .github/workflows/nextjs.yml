@@ -1,54 +1,107 @@
-name: CI
+name: Deploy Next.js to GitHub Pages
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      # 1. Checkout the repository
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      # Checkout the repository
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      # 2. Setup Node.js
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      # Detect package manager
+      - name: Detect package manager
+        id: detect-package-manager
+        run: |
+          if [ -f "${{ github.workspace }}/pnpm-lock.yaml" ]; then
+            echo "manager=pnpm" >> $GITHUB_OUTPUT
+            echo "command=install" >> $GITHUB_OUTPUT
+            echo "runner=pnpm" >> $GITHUB_OUTPUT
+          elif [ -f "${{ github.workspace }}/yarn.lock" ]; then
+            echo "manager=yarn" >> $GITHUB_OUTPUT
+            echo "command=install" >> $GITHUB_OUTPUT
+            echo "runner=yarn" >> $GITHUB_OUTPUT
+          elif [ -f "${{ github.workspace }}/package.json" ]; then
+            echo "manager=npm" >> $GITHUB_OUTPUT
+            echo "command=ci" >> $GITHUB_OUTPUT
+            echo "runner=npx --no-install" >> $GITHUB_OUTPUT
+          else
+            echo "Unable to determine package manager"
+            exit 1
+          fi
+
+      # Setup Node.js v22
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: '22'   # change to your required Node version
-          cache: 'pnpm'
+          node-version: "22"
+          cache: ${{ steps.detect-package-manager.outputs.manager }}
 
-      # 3. Install pnpm globally
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      # 4. Cache pnpm store for faster installs
-      - name: Cache pnpm store
-        uses: actions/cache@v3
+      # Setup pnpm if needed
+      - name: Setup pnpm
+        if: steps.detect-package-manager.outputs.manager == 'pnpm'
+        uses: pnpm/action-setup@v2
         with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          version: 8 # or latest stable
 
-      # 5. Install dependencies
+      # Setup GitHub Pages
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        with:
+          static_site_generator: next
+
+      # Restore Next.js cache
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml', '**/package-lock.json', '**/yarn.lock') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          restore-keys: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml', '**/package-lock.json', '**/yarn.lock') }}-
+
+      # Install dependencies
       - name: Install dependencies
-        run: pnpm install
+        run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
 
-      # 6. Build the Next.js project
-      - name: Build
-        run: pnpm build
+      # Setup environment variables
+      - name: Setup environment variables
+        run: |
+          echo "NEXT_PUBLIC_API_BASE_URL=${{ secrets.API_BASE_URL }}" >> .env.production
+          echo "NEXT_PUBLIC_API_KEY=${{ secrets.API_KEY }}" >> .env.production
 
-      # 7. Optional: Run tests if you have any
-      - name: Run tests
-        run: pnpm test
+      # Build Next.js
+      - name: Build with Next.js
+        run: ${{ steps.detect-package-manager.outputs.runner }} next build
 
-      # 8. Optional: Output pnpm version
-      - name: Check pnpm version
-        run: pnpm --version
+      # Export static site
+      - name: Export Next.js static site
+        run: ${{ steps.detect-package-manager.outputs.runner }} next export
+
+      # Upload artifact
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./out
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
