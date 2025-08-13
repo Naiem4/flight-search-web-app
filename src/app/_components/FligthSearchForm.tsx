@@ -56,7 +56,6 @@ export function FlightSearchForm({
     handleSubmit,
     watch,
     setValue,
-    getValues,
     formState: { errors },
   } = useForm<SearchFormData>({
     defaultValues: {
